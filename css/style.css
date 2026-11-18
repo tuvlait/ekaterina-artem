@@ -1,0 +1,691 @@
+/* =====================================================================
+   Свадьба Екатерины и Артёма — 27.08.2027
+   1. Переменные и база
+   2. Общие блоки (секции, заголовки, кнопки)
+   3. Меню
+   4. Обложка
+   5. Календарь + приглашение
+   6. Место и программа
+   7. Формы
+   8. Футер, анимации
+   9. Адаптив и мобильные фиксы
+   ===================================================================== */
+
+/* ===== 0. Шрифт Katarina Delvor (необязательно) =====
+   Сейчас используется Marck Script с Google Fonts — подключён <link> в index.html.
+   Если положите файлы шрифта в assets/fonts/, раскомментируйте блок ниже:
+
+@font-face {
+  font-family: 'Katarina Delvor';
+  src: url('../assets/fonts/KatarinaDelvor.woff2') format('woff2'),
+       url('../assets/fonts/KatarinaDelvor.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* ===== 1. Переменные ===== */
+:root {
+  --bg: #f7f3ec;
+  --bg-alt: #efe9df;
+  --ink: #1c1a17;
+  --muted: #6f675c;
+  --accent: #9c8468;
+  --accent-soft: rgba(156, 132, 104, .16);
+  --line: rgba(28, 26, 23, .12);
+  --white: #fff;
+  --script: 'Katarina Delvor', 'Marck Script', cursive;
+  --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius: 22px;
+  --shadow: 0 30px 70px -40px rgba(28, 26, 23, .35);
+  --narrow: 1120px;
+}
+
+/* ===== 1. База ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg { max-width: 100%; display: block; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; margin: 0; line-height: 1.15; }
+p { margin: 0 0 1em; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 18px;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  border-radius: 0 0 12px 0;
+}
+.skip:focus { left: 0; }
+
+/* ===== 2. Общие блоки ===== */
+.section {
+  max-width: var(--narrow);
+  margin: 0 auto;
+  padding: 110px 24px;
+  scroll-margin-top: 90px;
+}
+.section--alt { background: var(--bg-alt); }
+.section--alt .section { background: transparent; }
+
+.section__head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 52px;
+}
+.section__head .lead { margin-left: auto; margin-right: auto; }
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: .72rem;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+.section__title { font-size: clamp(1.9rem, 4vw, 3rem); margin-bottom: 18px; }
+.invite__text h2,
+.section__title { text-wrap: balance; }
+.lead {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--muted);
+  max-width: 56ch;
+}
+.hr { width: 56px; height: 1px; background: var(--accent); margin: 26px 0; border: 0; }
+
+/* ===== 2. Кнопки ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 30px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  font-family: var(--sans);
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .25s, color .25s, transform .25s, box-shadow .25s;
+}
+.btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -14px rgba(156, 132, 104, .9);
+}
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn--ghost:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn--full { width: 100%; }
+.btn--small { padding: 11px 20px; font-size: .68rem; letter-spacing: .12em; }
+.btn:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ===== 3. Меню ===== */
+.nav {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  top: max(18px, env(safe-area-inset-top));
+  transform: translate(-50%, -160%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(28, 26, 23, .08);
+  box-shadow: 0 18px 40px -24px rgba(28, 26, 23, .5);
+  transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav.is-visible { transform: translate(-50%, 0); }
+.nav a {
+  padding: 9px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: .74rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: background .2s, color .2s;
+}
+.nav a:hover { background: var(--ink); color: #fff; }
+
+/* ===== 4. Обложка ===== */
+.hero {
+  position: relative;
+  min-height: 100vh;              /* fallback для старых браузеров */
+  min-height: 100svh;             /* корректная высота на мобильных */
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: calc(120px + env(safe-area-inset-top)) 24px 96px;
+  color: #fff;
+  overflow: hidden;
+  background-color: #3a332c;
+  background-image:
+    linear-gradient(180deg, rgba(18, 16, 13, .62) 0%, rgba(18, 16, 13, .28) 42%, rgba(18, 16, 13, .78) 100%),
+    url('../assets/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero__inner { position: relative; z-index: 2; max-width: 900px; }
+.hero__eyebrow {
+  font-size: .72rem;
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  opacity: .9;
+  margin: 0 0 26px;
+}
+.hero__names {
+  font-family: var(--script);
+  font-size: clamp(3rem, 12vw, 6.6rem);
+  line-height: .98;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .02em;
+  text-shadow: 0 4px 40px rgba(0, 0, 0, .35);
+}
+.hero__names .amp {
+  font-size: .5em;
+  color: #e6d5c0;
+  line-height: 1;
+  margin: .06em 0;
+}
+.hero__date {
+  font-family: var(--serif);
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  letter-spacing: .42em;
+  text-transform: uppercase;
+  margin: 34px 0 0;
+  padding-left: .42em;
+  opacity: .95;
+}
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: clamp(14px, 4vw, 42px);
+  margin-top: 44px;
+}
+.countdown div { display: flex; flex-direction: column; align-items: center; min-width: 52px; }
+.countdown span {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 4.4vw, 2.4rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.countdown small {
+  font-size: .62rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  opacity: .72;
+  margin-top: 9px;
+}
+.hero__scroll {
+  position: absolute;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .64rem;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  opacity: .7;
+  z-index: 2;
+  color: #fff;
+  text-decoration: none;
+  animation: bob 2.4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 7px); }
+}
+
+/* ===== 5. Календарь + приглашение ===== */
+.invite__grid {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  gap: clamp(36px, 6vw, 80px);
+  align-items: center;
+}
+.cal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: clamp(24px, 4vw, 36px);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(28, 26, 23, .05);
+  text-align: center;
+}
+.cal__month {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.cal__month span { color: var(--accent); }
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.cal__dow {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 10px;
+}
+.cal__day {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font-size: clamp(.8rem, 2vw, .95rem);
+  border-radius: 50%;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.cal__day--empty { visibility: hidden; }
+.cal__day--special {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 0 0 6px var(--accent-soft);
+  position: relative;
+}
+.cal__day--special::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(156, 132, 104, .5);
+}
+.cal__caption {
+  margin: 20px 0 16px;
+  font-size: .72rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cal__ics { width: 100%; }
+
+.invite__text h2 { font-size: clamp(1.8rem, 3.6vw, 2.7rem); margin-bottom: 22px; }
+.invite__text p { color: var(--muted); font-size: 1.02rem; }
+.invite__text .eyebrow { color: var(--accent); }
+.sign {
+  font-family: var(--script);
+  font-size: 2rem;
+  color: var(--ink) !important;
+  margin-top: 28px;
+  line-height: 1.25;
+}
+
+/* ===== 6. Место и программа ===== */
+.details__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  margin-top: 12px;
+  align-items: start;
+}
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: clamp(26px, 4vw, 40px);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(28, 26, 23, .05);
+  display: flex;
+  flex-direction: column;
+}
+.card h3 { font-size: 1.45rem; margin-bottom: 8px; }
+.card__meta {
+  font-size: .72rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.addr { font-family: var(--serif); font-size: 1.25rem; line-height: 1.5; margin-bottom: 4px; }
+.card__note { font-size: .86rem; color: var(--muted); margin-bottom: 0; }
+.route-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+
+.timeline {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0 0 0 32px;
+  position: relative;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: var(--line);
+}
+.timeline li { position: relative; padding: 11px 0; }
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -32px;
+  top: 20px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+}
+.section--alt .timeline li::before { background: var(--bg-alt); }
+.timeline li:last-child::before { background: var(--accent); }
+.timeline time {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+.timeline span { font-size: .92rem; color: var(--muted); }
+
+/* ===== 7. Формы ===== */
+.field { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
+.field > label,
+.field__label {
+  font-size: .72rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+.field .hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 300;
+  opacity: .8;
+}
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea,
+select {
+  font-family: var(--sans);
+  font-size: 1rem;               /* 16px — iOS не будет зумить при фокусе */
+  font-weight: 300;
+  padding: 14px 18px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--ink);
+  transition: border-color .2s, box-shadow .2s;
+  appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%236f675c' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  padding-right: 44px;
+}
+textarea { resize: vertical; min-height: 104px; }
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(156, 132, 104, .13);
+}
+input::placeholder, textarea::placeholder { color: #b3aa9d; }
+input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(180, 70, 70, .1); }
+
+/* радио-«пилюли» */
+.pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { position: relative; }
+.pill input { position: absolute; opacity: 0; pointer-events: none; }
+.pill span {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 22px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  cursor: pointer;
+  font-size: .9rem;
+  transition: .2s;
+  user-select: none;
+}
+.pill span:hover { border-color: var(--accent); }
+.pill input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pill input:focus-visible + span { box-shadow: 0 0 0 4px rgba(156, 132, 104, .2); }
+
+/* карточки форм */
+.quiz-card,
+.rsvp-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: clamp(26px, 4vw, 48px);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(28, 26, 23, .05);
+  margin: 0 auto;
+}
+.quiz-card { max-width: 760px; }
+.rsvp-card { max-width: 680px; }
+
+/* блок «с кем придёте» скрывается, если гость не придёт */
+.rsvp__extra {
+  overflow: hidden;
+  transition: opacity .25s;
+}
+.rsvp__extra[hidden] { display: none; }
+
+.form-note {
+  font-size: .82rem;
+  color: var(--muted);
+  margin: 16px 0 0;
+  text-align: center;
+}
+.form-msg {
+  display: none;
+  margin-top: 18px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: rgba(156, 132, 104, .12);
+  border: 1px solid rgba(156, 132, 104, .35);
+  font-size: .94rem;
+}
+.form-msg.is-error { background: rgba(180, 70, 70, .08); border-color: rgba(180, 70, 70, .35); }
+.form-msg p { margin: 0 0 10px; }
+.form-msg p:last-child { margin-bottom: 0; }
+
+/* резервный режим: показать готовый ответ и отправить в мессенджер */
+.answer-box { display: flex; flex-direction: column; gap: 12px; }
+.answer-box textarea {
+  min-height: 150px;
+  font-size: .92rem;
+  background: #fffdf9;
+}
+.answer-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.answer-actions .btn { flex: 1 1 auto; }
+.answer-hint { font-size: .86rem; color: var(--muted); margin: 0; }
+.answer-note {
+  font-size: .8rem;
+  line-height: 1.5;
+  color: var(--muted);
+  opacity: .85;
+  margin: 2px 0 0;
+}
+
+/* ===== 8. Футер ===== */
+.footer {
+  text-align: center;
+  padding: 64px 24px calc(80px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+}
+.footer__names {
+  font-family: var(--script);
+  font-size: 2.2rem;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.footer small {
+  font-size: .72rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ===== 8. Анимация появления ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .85s cubic-bezier(.2, .7, .2, 1), transform .85s cubic-bezier(.2, .7, .2, 1);
+}
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .hero__scroll { animation: none; }
+}
+
+/* ===== 9. Адаптив ===== */
+
+/* планшет */
+@media (max-width: 900px) {
+  .section { padding: 84px 20px; }
+  .invite__grid,
+  .details__grid { grid-template-columns: 1fr; }
+  /* на телефоне сначала текст приглашения, потом календарь */
+  .invite__grid .cal { order: 2; }
+  .invite__grid .invite__text { order: 1; }
+  .cal { max-width: 460px; width: 100%; margin: 0 auto; }
+}
+
+/* телефон */
+@media (max-width: 620px) {
+  /* вертикальный кроп фото — легче (76 КБ вместо 118 КБ) и лучше кадрируется */
+  .hero {
+    background-image:
+      linear-gradient(180deg, rgba(18, 16, 13, .62) 0%, rgba(18, 16, 13, .28) 42%, rgba(18, 16, 13, .78) 100%),
+      url('../assets/hero-mobile.jpg');
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  /* четыре пункта меню должны влезать в 360 px без обрезки */
+  .nav { padding: 6px; gap: 2px; }
+  .nav a {
+    padding: 10px 10px;
+    font-size: .66rem;
+    letter-spacing: .04em;
+  }
+  .hero__eyebrow { font-size: .64rem; letter-spacing: .3em; }
+  .hero__names { font-size: clamp(2.9rem, 15vw, 4.6rem); }
+  .hero__date { letter-spacing: .3em; padding-left: .3em; }
+  .countdown { gap: 12px; margin-top: 36px; }
+  .countdown div { min-width: 44px; }
+  .countdown small { letter-spacing: .16em; font-size: .56rem; }
+  .btn { width: 100%; }
+  .route-links { flex-direction: column; }
+  .timeline { padding-left: 28px; }
+  .timeline li::before { left: -28px; }
+  .timeline::before { left: 6px; }
+  .pill span { padding: 12px 20px; font-size: .86rem; }
+  .sign { font-size: 1.7rem; }
+  .section { padding: 70px 18px; }
+  .section__head { margin-bottom: 38px; }
+}
+
+/* очень узкие экраны (iPhone SE и подобные) */
+@media (max-width: 380px) {
+  .hero { padding: calc(96px + env(safe-area-inset-top)) 18px 76px; }
+  .hero__names { font-size: 2.6rem; }
+  .hero__date { font-size: .95rem; margin-top: 26px; }
+  .countdown { gap: 8px; margin-top: 30px; }
+  .countdown div { min-width: 40px; }
+  .countdown span { font-size: 1.45rem; }
+  .countdown small { font-size: .52rem; letter-spacing: .12em; }
+  .cal__day--special { box-shadow: 0 0 0 3px var(--accent-soft); }
+  .cal__day--special::after { inset: -3px; }
+  .cal__month { font-size: 1.3rem; }
+  .pill span { padding: 11px 16px; font-size: .82rem; }
+  .section { padding: 64px 16px; }
+}
+
+/* ландшафт на телефоне: обложка не должна «разваливаться» */
+@media (max-height: 540px) and (orientation: landscape) {
+  .hero { min-height: auto; padding: calc(72px + env(safe-area-inset-top)) 24px 56px; }
+  .hero__names { font-size: clamp(2rem, 7vw, 3rem); }
+  .hero__eyebrow { margin-bottom: 14px; }
+  .hero__date { margin-top: 18px; }
+  .countdown { margin-top: 22px; }
+  .hero__scroll { display: none; }
+}
+
+/* тач-устройства: удобные тап-зоны и никакого «залипшего» hover */
+@media (hover: none) and (pointer: coarse) {
+  .nav a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .pill span { min-height: 46px; padding: 12px 22px; }
+  input[type="text"], input[type="email"], input[type="tel"], select { min-height: 52px; }
+  .btn:hover { transform: none; }
+  .pill span:hover { border-color: var(--line); }
+  .nav a:hover { background: transparent; color: var(--muted); }
+}
+
+/* печать приглашения */
+@media print {
+  .nav, .hero__scroll, .countdown, .btn, .footer { display: none !important; }
+  body { background: #fff; color: #000; }
+  .hero {
+    min-height: auto;
+    color: #000;
+    background: none !important;
+    padding: 40px 0;
+  }
+  .hero__names { text-shadow: none; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .cal, .card, .quiz-card, .rsvp-card { box-shadow: none; border: 1px solid #ddd; }
+}
