@@ -1,14 +1,5 @@
 /* =====================================================================
    Свадьба Екатерины и Артёма — 27.08.2027
-   1. Переменные и база
-   2. Общие блоки (секции, заголовки, кнопки)
-   3. Меню
-   4. Обложка
-   5. Календарь + приглашение
-   6. Место и программа
-   7. Формы
-   8. Футер, анимации
-   9. Адаптив и мобильные фиксы
    ===================================================================== */
 
 /* ===== 0. Шрифт Katarina Delvor (необязательно) =====
@@ -192,8 +183,8 @@ a { color: inherit; }
 /* ===== 4. Обложка ===== */
 .hero {
   position: relative;
-  min-height: 100vh;              /* fallback для старых браузеров */
-  min-height: 100svh;             /* корректная высота на мобильных */
+  min-height: 100vh;
+  min-height: 100svh;
   display: grid;
   place-items: center;
   text-align: center;
@@ -348,7 +339,13 @@ a { color: inherit; }
   text-transform: uppercase;
   color: var(--muted);
 }
-.cal__ics { width: 100%; }
+.cal__actions {
+  display: flex;
+  justify-content: center;
+}
+.cal__actions .btn {
+  width: 100%;
+}
 
 .invite__text h2 { font-size: clamp(1.8rem, 3.6vw, 2.7rem); margin-bottom: 22px; }
 .invite__text p { color: var(--muted); font-size: 1.02rem; }
@@ -451,7 +448,7 @@ input[type="tel"],
 textarea,
 select {
   font-family: var(--sans);
-  font-size: 1rem;               /* 16px — iOS не будет зумить при фокусе */
+  font-size: 1rem;
   font-weight: 300;
   padding: 14px 18px;
   width: 100%;
@@ -594,7 +591,6 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
   .section { padding: 84px 20px; }
   .invite__grid,
   .details__grid { grid-template-columns: 1fr; }
-  /* на телефоне сначала текст приглашения, потом календарь */
   .invite__grid .cal { order: 2; }
   .invite__grid .invite__text { order: 1; }
   .cal { max-width: 460px; width: 100%; margin: 0 auto; }
@@ -602,7 +598,6 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
 
 /* телефон */
 @media (max-width: 620px) {
-  /* вертикальный кроп фото — легче (76 КБ вместо 118 КБ) и лучше кадрируется */
   .hero {
     background-image:
       linear-gradient(180deg, rgba(18, 16, 13, .62) 0%, rgba(18, 16, 13, .28) 42%, rgba(18, 16, 13, .78) 100%),
@@ -611,7 +606,6 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
     padding-right: 20px;
   }
 
-  /* четыре пункта меню должны влезать в 360 px без обрезки */
   .nav { padding: 6px; gap: 2px; }
   .nav a {
     padding: 10px 10px;
@@ -635,7 +629,7 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
   .section__head { margin-bottom: 38px; }
 }
 
-/* очень узкие экраны (iPhone SE и подобные) */
+/* очень узкие экраны */
 @media (max-width: 380px) {
   .hero { padding: calc(96px + env(safe-area-inset-top)) 18px 76px; }
   .hero__names { font-size: 2.6rem; }
@@ -651,7 +645,7 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
   .section { padding: 64px 16px; }
 }
 
-/* ландшафт на телефоне: обложка не должна «разваливаться» */
+/* ландшафт на телефоне */
 @media (max-height: 540px) and (orientation: landscape) {
   .hero { min-height: auto; padding: calc(72px + env(safe-area-inset-top)) 24px 56px; }
   .hero__names { font-size: clamp(2rem, 7vw, 3rem); }
@@ -661,7 +655,7 @@ input[aria-invalid="true"] { border-color: #b44646; box-shadow: 0 0 0 4px rgba(1
   .hero__scroll { display: none; }
 }
 
-/* тач-устройства: удобные тап-зоны и никакого «залипшего» hover */
+/* тач-устройства */
 @media (hover: none) and (pointer: coarse) {
   .nav a {
     min-height: 44px;

@@ -1,40 +1,25 @@
 /* =====================================================================
    Свадьба Екатерины и Артёма — 27.08.2027
-   Скрипт без зависимостей: отсчёт, меню, анимации, календарь (.ics),
-   отправка анкет (Formspree) и резервный режим без сервера.
+   Скрипт без зависимостей: отсчёт, меню, анимации,
+   отправка анкет (Google Apps Script через JSONP).
    ===================================================================== */
 
 /* ---------------------------------------------------------------------
-   НАСТРОЙКИ. Меняются в одном месте — здесь.
+   НАСТРОЙКИ.
    --------------------------------------------------------------------- */
 var CONFIG = {
   /* Когда свадьба (для отсчёта) */
   date: '2027-08-27T15:00:00+03:00',
 
-  /* Для файла «добавить в календарь» */
-  event: {
-    title: 'Свадьба Екатерины и Артёма',
-    location: 'д. Летенец, Школьная ул., 2Б',
-    description: 'Сбор гостей в 15:00, церемония в 16:30, банкет в 18:00.',
-    start: '20270827T120000Z',
-    end: '20270827T220000Z'
-  },
-
-  /* Куда уходят ответы. Вариант 1 (рекомендуется): Google Таблица + Telegram.
-     Разверните apps-script/Code.gs как веб-приложение (инструкция в файле)
-     и вставьте сюда URL, который заканчивается на /exec:                     */
+  /* Google Apps Script — URL веб-приложения (заканчивается на /exec) */
   scriptUrl: 'https://script.google.com/macros/s/AKfycbxCyBTTa0eZRU4_d4hN5pSCrPG1a7zJHpev8wnpB_3xi_jku1RzZh4PscocUHw6zBkNAw/exec',
 
-  /* Вариант 2: Formspree — форма отправляется на его сервер, ответы на почту.
-     formEndpoint: 'https://formspree.io/f/mnqkzbcd',                       */
+  /* Formspree — если понадобится резервный канал (не обязательно) */
   formEndpoint: '',
 
-  /* Резервный режим (если ни scriptUrl, ни formEndpoint не заданы):
-     ответ не уходит на сервер, а открывается готовым сообщением в Telegram.
-     Впишите ник в Telegram (без @) — кнопка откроет чат сразу с вами.
-     Если оставить пустым, работает системное «поделиться»:
-     гость сам выбирает ваш чат в списке.                                 */
-  telegram: 'artiom_gorch'    /* например: 'ekaterina_artem' */
+  /* Резервный режим: если сервер не ответил, гость может прислать ответ в Telegram.
+     Впиши ник (без @). Если пусто — работает системное «поделиться». */
+  telegram: 'artiom_gorch'
 };
 
 /* ---------------------------------------------------------------------
@@ -107,50 +92,7 @@ var CONFIG = {
 })();
 
 /* ---------------------------------------------------------------------
-   4. Кнопка «Добавить в календарь» (.ics)
-   --------------------------------------------------------------------- */
-(function () {
-  var btn = document.querySelector('[data-ics]');
-  if (!btn) return;
-
-  btn.addEventListener('click', function () {
-    var e = CONFIG.event;
-    var stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-    var esc = function (v) {
-      return String(v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
-    };
-    var ics = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Wedding//Ekaterina and Artem//RU',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'BEGIN:VEVENT',
-      'UID:' + stamp + '@wedding',
-      'DTSTAMP:' + stamp,
-      'DTSTART:' + e.start,
-      'DTEND:' + e.end,
-      'SUMMARY:' + esc(e.title),
-      'LOCATION:' + esc(e.location),
-      'DESCRIPTION:' + esc(e.description),
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-
-    var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'svadba-27-08-2027.ics';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-  });
-})();
-
-/* ---------------------------------------------------------------------
-   5. Анкета: если гость выбрал «не приду», прячем лишние вопросы
+   4. Анкета: если гость выбрал «не приду», прячем лишние вопросы
    --------------------------------------------------------------------- */
 (function () {
   var form = document.getElementById('rsvpForm');
@@ -171,12 +113,11 @@ var CONFIG = {
 })();
 
 /* ---------------------------------------------------------------------
-   6. Отправка форм
+   5. Отправка форм
    --------------------------------------------------------------------- */
 (function () {
   var LS_KEY = 'wedding:answers';
 
-  /* Подпись поля: <label for>, иначе .field__label, иначе name */
   function labelOf(form, field) {
     if (field.id) {
       var l = form.querySelector('label[for="' + field.id + '"]');
@@ -192,7 +133,6 @@ var CONFIG = {
     return field.name || '';
   }
 
-  /* Собираем ответ в читаемый текст */
   function buildText(form) {
     var isQuiz = form.id === 'quizForm';
     var head = isQuiz
